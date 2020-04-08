@@ -16,62 +16,95 @@ private let dateFormatter: DateFormatter = {
 }()
 
 struct ContentView: View {
-    @State private var dates = [Date]()
 
     var body: some View {
         NavigationView {
-            MasterView(dates: $dates)
+            MasterView()
                 .navigationBarTitle(Text("Master"))
-                .navigationBarItems(
-                    leading: EditButton(),
-                    trailing: Button(
-                        action: {
-                            withAnimation { self.dates.insert(Date(), at: 0) }
-                        }
-                    ) {
-                        Image(systemName: "plus")
-                    }
-                )
             DetailView()
         }.navigationViewStyle(DoubleColumnNavigationViewStyle())
     }
 }
 
 struct MasterView: View {
-    @Binding var dates: [Date]
+    @ObservedObject var launchInfo = FetchLaunchInfo.shared
 
     var body: some View {
-        List {
-            ForEach(dates, id: \.self) { date in
-                NavigationLink(
-                    destination: DetailView(selectedDate: date)
-                ) {
-                    Text("\(date, formatter: dateFormatter)")
-                }
-            }.onDelete { indices in
-                indices.forEach { self.dates.remove(at: $0) }
+        List(launchInfo.data) {
+            launchInfo in
+            NavigationLink(destination:
+                DetailView(launchInfo: launchInfo))
+            {
+                Text("\(launchInfo.missionName)")
             }
         }
     }
 }
 
 struct DetailView: View {
-    var selectedDate: Date?
-
+    var launchInfo: LaunchInfo?
+    
+    var introText: String
+    {
+        return "Select a mission from the left to see the details for that launch\n"
+            + "(swipe from the left to see list of missions if they aren't visible)"
+    }
+    
     var body: some View {
         Group {
-            if selectedDate != nil {
-                Text("\(selectedDate!, formatter: dateFormatter)")
+            if launchInfo != nil {
+                VStack {
+                    AsyncImage(url: launchInfo!.missionPatch)
+                    Text("Rocket: \(launchInfo!.rocketInfo.name)")
+                    Text("Launched from \(launchInfo!.launchSite.name)")
+                    Text("on \(launchInfo!.launchDate)")
+                }
             } else {
-                Text("Detail view content goes here")
+                Text(introText).multilineTextAlignment(.center)
             }
-        }.navigationBarTitle(Text("Detail"))
+        }.navigationBarTitle(Text("\(launchInfo?.missionName ?? "SpaceX Missions")"))
     }
 }
 
+struct ActivityIndicator: UIViewRepresentable {
+
+    @Binding var isAnimating: Bool
+    let style: UIActivityIndicatorView.Style
+
+    typealias Context = UIViewRepresentableContext<ActivityIndicator>
+    func makeUIView(context: Context) -> UIActivityIndicatorView {
+        return UIActivityIndicatorView(style: style)
+    }
+
+    func updateUIView(_ uiView: UIActivityIndicatorView, context: UIViewRepresentableContext<ActivityIndicator>) {
+        isAnimating ? uiView.startAnimating() : uiView.stopAnimating()
+    }
+}
+
+struct AsyncImage: View {
+    @ObservedObject private var loader: ImageLoader
+    
+    init(url: String) { loader = ImageLoader(url) }
+
+    var body: some View {
+        image
+            .onAppear(perform: loader.load)
+            .onDisappear(perform: loader.cancel)
+    }
+    
+    private var image: some View {
+        Group {
+            if loader.image != nil {
+                Image(uiImage: loader.image!)
+            }
+            else
+            {
+                ActivityIndicator(isAnimating: .constant(true), style: .large)
+            }
+        }
+    }
+}
 
 struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
-    }
+    static var previews: some View { ContentView()  }
 }

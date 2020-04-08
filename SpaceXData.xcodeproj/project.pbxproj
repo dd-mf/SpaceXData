@@ -15,6 +15,8 @@
 		8C216646243DFDF200117FB5 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8C216644243DFDF200117FB5 /* LaunchScreen.storyboard */; };
 		8C216651243DFDF200117FB5 /* SpaceXDataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C216650243DFDF200117FB5 /* SpaceXDataTests.swift */; };
 		8C21665C243DFDF200117FB5 /* SpaceXDataUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C21665B243DFDF200117FB5 /* SpaceXDataUITests.swift */; };
+		8C2166A8243E0B8000117FB5 /* LaunchInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C2166A7243E0B8000117FB5 /* LaunchInfo.swift */; };
+		8C2166A9243E0B8000117FB5 /* LaunchInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C2166A7243E0B8000117FB5 /* LaunchInfo.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,6 +51,7 @@
 		8C216657243DFDF200117FB5 /* SpaceXDataUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SpaceXDataUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8C21665B243DFDF200117FB5 /* SpaceXDataUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpaceXDataUITests.swift; sourceTree = "<group>"; };
 		8C21665D243DFDF200117FB5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8C2166A7243E0B8000117FB5 /* LaunchInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchInfo.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -102,6 +105,7 @@
 				8C216639243DFDF000117FB5 /* AppDelegate.swift */,
 				8C21663B243DFDF000117FB5 /* SceneDelegate.swift */,
 				8C21663D243DFDF000117FB5 /* ContentView.swift */,
+				8C2166A7243E0B8000117FB5 /* LaunchInfo.swift */,
 				8C21663F243DFDF200117FB5 /* Assets.xcassets */,
 				8C216644243DFDF200117FB5 /* LaunchScreen.storyboard */,
 				8C216647243DFDF200117FB5 /* Info.plist */,
@@ -269,6 +273,7 @@
 			files = (
 				8C21663A243DFDF000117FB5 /* AppDelegate.swift in Sources */,
 				8C21663C243DFDF000117FB5 /* SceneDelegate.swift in Sources */,
+				8C2166A8243E0B8000117FB5 /* LaunchInfo.swift in Sources */,
 				8C21663E243DFDF000117FB5 /* ContentView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -277,6 +282,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8C2166A9243E0B8000117FB5 /* LaunchInfo.swift in Sources */,
 				8C216651243DFDF200117FB5 /* SpaceXDataTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
