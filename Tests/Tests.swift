@@ -1,15 +1,15 @@
 //
-//  SpaceXDataTests.swift
-//  SpaceXDataTests
+//  DemoTests.swift
+//  DemoTests
 //
-//  Created by me on 4/8/20.
+//  Created by J.Rodden on 4/8/20.
 //  Copyright © 2020 DD/MF & Associates. All rights reserved.
 //
 
 import XCTest
-@testable import SpaceXData
+@testable import Demo
 
-class SpaceXDataTests: XCTestCase {
+class DemoTests: XCTestCase {
 
     override func setUp() {
         // Put setup code here. This method is called before the invocation of each test method in the class.

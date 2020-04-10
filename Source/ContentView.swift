@@ -1,8 +1,8 @@
 //
 //  ContentView.swift
-//  SpaceXData
+//  Demo
 //
-//  Created by me on 4/8/20.
+//  Created by J.Rodden on 4/8/20.
 //  Copyright © 2020 DD/MF & Associates. All rights reserved.
 //
 
@@ -49,7 +49,7 @@ struct DetailView: View {
         return "Select a mission from the left to see the details for that launch\n"
             + "(swipe from the left to see list of missions if they aren't visible)"
     }
-    
+
     var body: some View {
         Group {
             if launchInfo != nil {

@@ -1,8 +1,8 @@
 //
 //  SceneDelegate.swift
-//  SpaceXData
+//  Demo
 //
-//  Created by me on 4/8/20.
+//  Created by J.Rodden on 4/8/20.
 //  Copyright © 2020 DD/MF & Associates. All rights reserved.
 //
 
