@@ -111,8 +111,6 @@
 				8C2166F22441067800117FB5 /* AppDelegate.swift */,
 				8C2166F42441067800117FB5 /* SceneDelegate.swift */,
 				8C2166F62441067800117FB5 /* ContentView.swift */,
-				8C21673324410AF200117FB5 /* LaunchInfo.swift */,
-				8C2167392442B95300117FB5 /* Photos.swift */,
 				8C21673C2445191400117FB5 /* Models */,
 				8C21673B2445190800117FB5 /* Utilities */,
 				8C216725244107C800117FB5 /* Resources */,
@@ -169,6 +167,8 @@
 		8C21673C2445191400117FB5 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				8C2167392442B95300117FB5 /* Photos.swift */,
+				8C21673324410AF200117FB5 /* LaunchInfo.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
