@@ -8,103 +8,203 @@
 
 import SwiftUI
 
-private let dateFormatter: DateFormatter = {
-    let dateFormatter = DateFormatter()
-    dateFormatter.dateStyle = .medium
-    dateFormatter.timeStyle = .medium
-    return dateFormatter
-}()
+protocol ListItem
+{
+    var title: String { get }
+    var thumbnailURL: String { get }
+}
 
-struct ContentView: View {
+// MARK: -
 
-    var body: some View {
-        NavigationView {
-            MasterView()
-                .navigationBarTitle(Text("Master"))
+struct ContentView: View
+{
+    @State private var selectedTab = 1
+    
+    private let tabs: [(String, AnyView)] =
+        [("SpaceX Launches", AnyView(ListOfLaunches())),
+         ("Photo Viewer", AnyView(ListOfPhotos()))]
+
+    var body: some View
+    {
+        NavigationView
+        {
+            VStack
+            {
+                Picker("", selection: $selectedTab)
+                {
+                    ForEach(0 ..< tabs.count)
+                    {
+                        Text(self.tabs[$0].0)//.tag($0)
+                    }
+                }
+                .pickerStyle(SegmentedPickerStyle())
+
+                tabs[selectedTab].1
+                Spacer()
+            }
+
             DetailView()
-        }.navigationViewStyle(DoubleColumnNavigationViewStyle())
+        }
+        .navigationBarHidden(true)
+        .navigationViewStyle(DoubleColumnNavigationViewStyle())
     }
 }
 
-struct MasterView: View {
-    @ObservedObject var launchInfo = FetchLaunchInfo.shared
+struct ListOfLaunches: View
+{
+    @ObservedObject var items = LaunchInfo.History()
 
-    var body: some View {
-        List(launchInfo.data) {
-            launchInfo in
-            NavigationLink(destination:
-                DetailView(launchInfo: launchInfo))
+    var body: some View { List(items.data) { ListCell(item: $0) } }
+}
+
+struct ListOfPhotos: View
+{
+    @ObservedObject var items = Photo.Library()
+    
+    var body: some View { List(items.info) { ListCell(item: $0) } }
+}
+
+struct ListCell: View
+{
+    var item: ListItem
+    
+    var body: some View
+    {
+        HStack
+        {
+            AsyncImage(url: item.thumbnailURL).frame(maxWidth: 30, maxHeight: 30)
+            NavigationLink(destination: DetailView(info:item)) { Text("\(item.title)") }
+        }
+    }
+}
+
+struct DetailView: View
+{
+    var info: ListItem?
+    
+    var body: some View
+    {
+        if let info = info as? Photo
+        {
+            return AnyView(PhotoDetailView(photo: info))
+        }
+        if let info = info as? LaunchInfo
+        {
+            return AnyView(LaunchDetailView(launchInfo: info))
+        }
+        return AnyView(Text("Select an item from the list on left (swipe if not visible)"))
+    }
+}
+
+// MARK: -
+
+struct LaunchDetailView: View
+{
+    var launchInfo: LaunchInfo
+    
+    var body: some View
+    {
+        VStack
+        {
+            AsyncImage(url: launchInfo.missionPatch).frame(maxHeight: 200)
+            Text("Rocket: \(launchInfo.rocketInfo.name)")
+            Text("Launched from \(launchInfo.launchSite.name)")
+            Text("on \(launchInfo.launchDate)")
+        }
+        .navigationBarTitle(Text(launchInfo.missionName))
+    }
+}
+
+// MARK: -
+
+struct PhotoDetailView: View
+{
+    var photo: Photo
+    
+    var body: some View
+    {
+        ZStack
+        {
+            AsyncImage(url: photo.url)
+            
+            Group { ImageInfoView(for: photo) }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
+        }
+        .navigationBarTitle(Text(photo.title))
+    }
+
+    struct ImageInfoView: View
+    {
+        init(for photo: Photo)
+        {
+            album = photo.album
+            comments = photo.comments
+        }
+        
+        @ObservedObject var album: Photo.Album
+        @ObservedObject var comments: Photo.Comments
+
+        var body: some View
+        {
+            Group
             {
-                Text("\(launchInfo.missionName)")
+                VStack
+                {
+                    if album.user != nil && comments.info != nil
+                    {
+                        UserInfoView(user: album.user!)
+                        Text("\(comments.info!.count) Comments")
+                    }
+                }
+                .padding(EdgeInsets(top: 0, leading: 10, bottom: 0, trailing: 10))
+            }
+            .padding(EdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10))
+            .background(Color.white).opacity(0.75).cornerRadius(3)
+            .shadow(radius: 3, x: -3, y: -3)
+        }
+    }
+    
+    struct UserInfoView: View
+    {
+        @ObservedObject var user: Photo.Album.User
+        
+        var body: some View
+        {
+            Group
+            {
+                if user.info != nil
+                {
+                    Text(user.info!.name)
+                    Text(user.info!.email)
+                    Text(user.info!.websiteURL)
+                }
             }
         }
     }
 }
 
-struct DetailView: View {
-    var launchInfo: LaunchInfo?
-    
-    var introText: String
-    {
-        return "Select a mission from the left to see the details for that launch\n"
-            + "(swipe from the left to see list of missions if they aren't visible)"
-    }
+// MARK: -
 
-    var body: some View {
-        Group {
-            if launchInfo != nil {
-                VStack {
-                    AsyncImage(url: launchInfo!.missionPatch)
-                    Text("Rocket: \(launchInfo!.rocketInfo.name)")
-                    Text("Launched from \(launchInfo!.launchSite.name)")
-                    Text("on \(launchInfo!.launchDate)")
-                }
-            } else {
-                Text(introText).multilineTextAlignment(.center)
-            }
-        }.navigationBarTitle(Text("\(launchInfo?.missionName ?? "SpaceX Missions")"))
-    }
-}
-
-struct ActivityIndicator: UIViewRepresentable {
-
+struct ActivityIndicator: UIViewRepresentable
+{
     @Binding var isAnimating: Bool
     let style: UIActivityIndicatorView.Style
 
     typealias Context = UIViewRepresentableContext<ActivityIndicator>
-    func makeUIView(context: Context) -> UIActivityIndicatorView {
+    func makeUIView(context: Context) -> UIActivityIndicatorView
+    {
         return UIActivityIndicatorView(style: style)
     }
 
-    func updateUIView(_ uiView: UIActivityIndicatorView, context: UIViewRepresentableContext<ActivityIndicator>) {
+    func updateUIView(_ uiView: UIActivityIndicatorView, context: Context)
+    {
         isAnimating ? uiView.startAnimating() : uiView.stopAnimating()
     }
 }
 
-struct AsyncImage: View {
-    @ObservedObject private var loader: ImageLoader
-    
-    init(url: String) { loader = ImageLoader(url) }
+// MARK: -
 
-    var body: some View {
-        image
-            .onAppear(perform: loader.load)
-            .onDisappear(perform: loader.cancel)
-    }
-    
-    private var image: some View {
-        Group {
-            if loader.image != nil {
-                Image(uiImage: loader.image!)
-            }
-            else
-            {
-                ActivityIndicator(isAnimating: .constant(true), style: .large)
-            }
-        }
-    }
-}
-
-struct ContentView_Previews: PreviewProvider {
+struct ContentView_Previews: PreviewProvider
+{
     static var previews: some View { ContentView()  }
 }

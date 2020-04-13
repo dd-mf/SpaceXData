@@ -1,5 +1,5 @@
 //
-//  LaunchInfo.swift
+//  Launches.swift
 //  Demo
 //
 //  Created by J.Rodden on 4/8/20.
@@ -10,7 +10,7 @@ import UIKit
 import Combine
 import Foundation
 
-struct LaunchInfo: Identifiable
+struct LaunchInfo
 {
     let flightNum: Int
     let launchDate: String
@@ -21,8 +21,7 @@ struct LaunchInfo: Identifiable
     {
         let name: String
 
-        enum CodingKeys:
-            String, CodingKey
+        enum CodingKeys: String, CodingKey
         {
             case name = "rocket_name"
         }
@@ -33,8 +32,7 @@ struct LaunchInfo: Identifiable
     {
         let name: String
 
-        enum CodingKeys:
-            String, CodingKey
+        enum CodingKeys: String, CodingKey
         {
             case name = "site_name"
         }
@@ -45,15 +43,24 @@ struct LaunchInfo: Identifiable
     {
         let missionPatch: String
         
-        enum CodingKeys:
-            String, CodingKey
+        enum CodingKeys: String, CodingKey
         {
             case missionPatch = "mission_patch_small"
         }
     }
-    
-    var id: Int { return flightNum }
+
     var missionPatch: String { return links.missionPatch }
+}
+
+extension LaunchInfo: Identifiable
+{
+    var id: Int { return flightNum }
+}
+
+extension LaunchInfo: ListItem
+{
+    var title: String { return missionName }
+    var thumbnailURL: String { return missionPatch }
 }
 
 extension LaunchInfo: Codable
@@ -67,25 +74,6 @@ extension LaunchInfo: Codable
         case flightNum = "flight_number"
         case missionName = "mission_name"
         case launchDate = "launch_date_utc"
-    }
-}
-
-extension LaunchInfo: Hashable
-{
-    var hashValue: Int
-    {
-        return flightNum.hashValue
-    }
-
-    func hash(into hasher: inout Hasher)
-    {
-        flightNum.hash(into: &hasher)
-    }
-
-    static func == (lhs: LaunchInfo,
-                    rhs: LaunchInfo) -> Bool
-    {
-        return lhs.flightNum == rhs.flightNum
     }
 }
 
@@ -116,70 +104,14 @@ extension LaunchInfo
         
         case base, all, past, next, latest, upcoming, launch(number: Int)
     }
-}
-
-class ImageLoader: ObservableObject
-{
-    private let url: URL?
-    @Published var image: UIImage?
-    private var cancellable: AnyCancellable?
-
-    init(_ url: URL?) { self.url = url }
-
-    convenience init(_ urlString: String) {
-        self.init(URL(string: urlString))
-    }
     
-    deinit { cancellable?.cancel() }
-
-    func load() {
-        guard let url = url else { return }
-        cancellable = URLSession.shared.dataTaskPublisher(for: url)
-            .map { UIImage(data: $0.data) }
-            .replaceError(with: nil)
-            .receive(on: DispatchQueue.main)
-            .assign(to: \.image, on: self)
-    }
-    
-    func cancel() { cancellable?.cancel() }
-}
-
-class FetchLaunchInfo: ObservableObject
-{
-    static let shared = FetchLaunchInfo()
-
-    static let queue = DispatchQueue(
-        label: "FetchData", qos: .background)
-    
-    @Published private(set) var data = [LaunchInfo]()
-
-    private init()
+    final class History: ObservableObject
     {
-        let urlString = LaunchInfo.API.past.urlString
-        guard let url = URL(string: urlString) else { return }
-
-        FetchLaunchInfo.queue.async {
-            URLSession.shared.dataTask(with: url)
-            {
-                data, response, error in
-                guard let data = data else { return }
-                
-                do {
-                    let result = try JSONDecoder()
-                        .decode([LaunchInfo].self, from: data)
-                    
-                    DispatchQueue.main.async { self.data = result }
-                } catch let error { print(error) }
-            }.resume()
+        @Published private(set) var data = [LaunchInfo]()
+        
+        init()
+        {
+            fetchData(from: API.past.urlString) { self.data = $0 }
         }
-    }
-}
-
-extension Dictionary where Key == String, Value == UIImage
-{
-    subscript(unchecked key: Key) -> Value?
-    {
-        get { return self[key] }
-        set { self[key] = newValue }
     }
 }
