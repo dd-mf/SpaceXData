@@ -44,6 +44,18 @@ func fetchData<Item: Decodable>(from urlString: String,
     }
 }
 
+fileprivate func filename(for url: URL) -> URL?
+{
+    guard let documents =
+        FileManager.default.urls(
+            for: .documentDirectory,
+            in: .userDomainMask).first else { return nil }
+    
+    let filename = url.path
+        .replacingOccurrences(of: "/", with: "-")
+    return documents.appendingPathComponent(filename)
+}
+
 fileprivate func fetch(from urlString: String,
                        decodeAndStore: @escaping ((Data) throws -> ()))
 {
@@ -51,16 +63,29 @@ fileprivate func fetch(from urlString: String,
     
     let queue = DispatchQueue(
         label: "fetch from: \(urlString)", qos: .background)
-    
+
     queue.async {
+        let localFile = filename(for: url)
         URLSession.shared.dataTask(with: url)
         {
             data, response, error in
-            guard let data = data else {
-                return print("no response from \(url)")
+        
+            do
+            {
+                guard let data = try data ??
+                    ((localFile == nil) ? nil :
+                        Data(contentsOf: localFile!)) else
+                {
+                    return print("no response from \(url)")
+                }
+
+                try decodeAndStore(data)
+                if let localFile = localFile
+                {
+                    try data.write(to: localFile,
+                                   options: .atomic)
+                }
             }
-            
-            do { try decodeAndStore(data) }
             catch let error { print(error) }
         }.resume()
     }

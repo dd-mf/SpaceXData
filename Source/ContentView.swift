@@ -18,11 +18,11 @@ protocol ListItem
 
 struct ContentView: View
 {
-    @State private var selectedTab = 1
+    @State private var selectedTab = 0
     
     private let tabs: [(String, AnyView)] =
-        [("SpaceX Launches", AnyView(ListOfLaunches())),
-         ("Photo Viewer", AnyView(ListOfPhotos()))]
+        [("Photo Viewer", AnyView(ListOfPhotos())),
+         ("SpaceX Launches", AnyView(ListOfLaunches()))]
 
     var body: some View
     {
@@ -39,7 +39,7 @@ struct ContentView: View
                 }
                 .pickerStyle(SegmentedPickerStyle())
 
-                tabs[selectedTab].1
+                tabs[selectedTab].1 // listOf(Photos/Launches)
                 Spacer()
             }
 
@@ -54,14 +54,40 @@ struct ListOfLaunches: View
 {
     @ObservedObject var items = LaunchInfo.History()
 
-    var body: some View { List(items.data) { ListCell(item: $0) } }
+    var body: some View
+    {
+        Group
+        {
+            if items.info == nil
+            {
+                Text("No Items Available")
+            }
+            else
+            {
+                List(items.info!, rowContent: ListCell.init)
+            }
+        }
+    }
 }
 
 struct ListOfPhotos: View
 {
     @ObservedObject var items = Photo.Library()
     
-    var body: some View { List(items.info) { ListCell(item: $0) } }
+    var body: some View
+    {
+        Group
+        {
+            if items.info == nil
+            {
+                Text("No Items Available")
+            }
+            else
+            {
+                List(items.info!, rowContent: ListCell.init)
+            }
+        }
+    }
 }
 
 struct ListCell: View
@@ -128,7 +154,8 @@ struct PhotoDetailView: View
             AsyncImage(url: photo.url)
             
             Group { ImageInfoView(for: photo) }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
+            .frame(maxWidth: .infinity, maxHeight:
+                .infinity, alignment: .bottomTrailing)
         }
         .navigationBarTitle(Text(photo.title))
     }
@@ -143,40 +170,43 @@ struct PhotoDetailView: View
         
         @ObservedObject var album: Photo.Album
         @ObservedObject var comments: Photo.Comments
+        
+        struct UserInfoView: View
+        {
+            @ObservedObject var user: Photo.Album.User
+            
+            var body: some View
+            {
+                Group
+                {
+                    if user.info != nil
+                    {
+                        Text(user.info!.name)
+                        Text(user.info!.email)
+                        Text(user.info!.websiteURL)
+                    }
+                }
+            }
+        }
 
         var body: some View
         {
             Group
             {
-                VStack
+                if album.user != nil && comments.info != nil
                 {
-                    if album.user != nil && comments.info != nil
+                    Group
                     {
-                        UserInfoView(user: album.user!)
-                        Text("\(comments.info!.count) Comments")
+                        VStack
+                        {
+                            UserInfoView(user: album.user!)
+                            Text("\(comments.info!.count) Comments")
+                        }
+                        .padding(EdgeInsets(top: 0, leading: 10, bottom: 0, trailing: 10))
                     }
-                }
-                .padding(EdgeInsets(top: 0, leading: 10, bottom: 0, trailing: 10))
-            }
-            .padding(EdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10))
-            .background(Color.white).opacity(0.75).cornerRadius(3)
-            .shadow(radius: 3, x: -3, y: -3)
-        }
-    }
-    
-    struct UserInfoView: View
-    {
-        @ObservedObject var user: Photo.Album.User
-        
-        var body: some View
-        {
-            Group
-            {
-                if user.info != nil
-                {
-                    Text(user.info!.name)
-                    Text(user.info!.email)
-                    Text(user.info!.websiteURL)
+                    .padding(EdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10))
+                    .background(Color.white).opacity(0.75).cornerRadius(3)
+                    .shadow(radius: 3, x: -3, y: -3)
                 }
             }
         }

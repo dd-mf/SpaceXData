@@ -107,11 +107,11 @@ extension LaunchInfo
     
     final class History: ObservableObject
     {
-        @Published private(set) var data = [LaunchInfo]()
-        
+        @Published private(set) var info: [LaunchInfo]?
+
         init()
         {
-            fetchData(from: API.past.urlString) { self.data = $0 }
+            fetchData(from: API.past.urlString) { self.info = $0 }
         }
     }
 }

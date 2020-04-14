@@ -2,7 +2,7 @@
 //  Photos.swift
 //  Demo
 //
-//  Created by me on 4/11/20.
+//  Created by J.Rodden on 4/11/20.
 //  Copyright © 2020 DD/MF & Associates. All rights reserved.
 //
 
@@ -55,8 +55,8 @@ extension Photo
 {
     final class Library: ObservableObject
     {
-        @Published private(set) var info = [Photo]()
-        
+        @Published private(set) var info: [Photo]?
+
         init()
         {
             fetchData(from: API.photos.urlString) { self.info = $0 }
