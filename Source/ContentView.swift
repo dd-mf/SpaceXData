@@ -10,6 +10,7 @@ import SwiftUI
 
 protocol ListItem
 {
+    var id: Int { get }
     var title: String { get }
     var thumbnailURL: String { get }
 }
@@ -52,12 +53,17 @@ struct ContentView: View
 
 struct ListOfLaunches: View
 {
-    @ObservedObject var items = LaunchInfo.History()
-    @ObservedObject var favorites = Favorites(named: "Launches")
+    init(items: LaunchInfo.History = LaunchInfo.History())
+    {
+        self.items = items; favorites = items.favorites
+    }
+    
+    @ObservedObject private var favorites: Favorites
+    @ObservedObject private var items: LaunchInfo.History
 
     var body: some View
     {
-        Group
+        VStack
         {
             if items.info == nil
             {
@@ -74,12 +80,18 @@ struct ListOfLaunches: View
 
 struct ListOfPhotos: View
 {
-    @ObservedObject var items = Photo.Library()
-    @ObservedObject var favorites = Favorites(named: "Photos")
+    @ObservedObject private var items: Photo.Library
+    @ObservedObject private var favorites: Favorites
+    
+    init(items: Photo.Library = Photo.Library())
+    {
+        self.items = items
+        favorites = items.favorites
+    }
     
     var body: some View
     {
-        Group
+        VStack
         {
             if items.info == nil
             {
@@ -103,7 +115,38 @@ struct ListCell: View
         HStack
         {
             AsyncImage(url: item.thumbnailURL).frame(maxWidth: 30, maxHeight: 30)
-            NavigationLink(destination: DetailView(info:item)) { Text("\(item.title)") }
+            NavigationLink(destination: DetailView(info:item))
+            {
+                // workaround vertical alignment issue
+                VStack(alignment: .leading)
+                {
+                    Text("\(item.title)")
+                }
+                .layoutPriority(1)
+                
+                FavoriteMarker(id: item.id)
+            }
+        }
+    }
+}
+
+struct FavoriteMarker: View
+{
+    var id: Int
+    
+    @EnvironmentObject var favorites: Favorites
+    var isFavorite: Bool { return favorites.contains(id) }
+
+    var body: some View
+    {
+        Group
+        {
+            if isFavorite
+            {
+                Spacer()
+                Image(systemName: "heart.fill")
+                    .accessibility(label: Text("This is a favorite item"))
+            }
         }
     }
 }
@@ -129,11 +172,9 @@ struct DetailView: View
 struct FavoritButton: View
 {
     let id: Int
-    var isOn: Bool
-    {
-        return favorites.contains(id)
-    }
+    
     @EnvironmentObject var favorites: Favorites
+    var isOn: Bool { return favorites.contains(id) }
 
     var body: some View
     {

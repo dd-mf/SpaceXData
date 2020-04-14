@@ -39,6 +39,11 @@ class Favorites: ObservableObject
         save()
     }
 
+    func sort(_ lhs: Int, _ rhs: Int) -> Bool?
+    {
+        return contains(lhs) && !contains(rhs) ? true : nil
+    }
+    
     func toggle(_ id: Int) { (!contains(id) ? add : remove)(id) }
     
     func contains(_ id: Int) -> Bool { return items.contains(id) }

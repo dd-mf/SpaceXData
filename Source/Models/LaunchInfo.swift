@@ -57,6 +57,7 @@ extension LaunchInfo: Identifiable
     var id: Int { return flightNum }
 }
 
+
 extension LaunchInfo: ListItem
 {
     var title: String { return missionName }
@@ -108,10 +109,19 @@ extension LaunchInfo
     final class History: ObservableObject
     {
         @Published private(set) var info: [LaunchInfo]?
+        @Published var favorites = Favorites(named: "Launches")
 
         init()
         {
-            fetchData(from: API.past.urlString) { self.info = $0 }
+            fetchData(from: API.past.urlString)
+            {
+                self.info = $0.sorted
+                {   // sort by favorite membership,
+                    // then sort by launchDate
+                    self.favorites.sort($0.id, $1.id) ??
+                        ($0.launchDate < $1.launchDate)
+                }
+            }
         }
     }
 }
