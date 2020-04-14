@@ -19,6 +19,7 @@
 		8C2167362442A5C300117FB5 /* ImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C2167352442A5C300117FB5 /* ImageLoader.swift */; };
 		8C2167382442A5F900117FB5 /* FetchData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C2167372442A5F900117FB5 /* FetchData.swift */; };
 		8C21673A2442B95300117FB5 /* Photos.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C2167392442B95300117FB5 /* Photos.swift */; };
+		8C21673E24456B1200117FB5 /* Favorites.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C21673D24456B1200117FB5 /* Favorites.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,6 +58,7 @@
 		8C2167352442A5C300117FB5 /* ImageLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageLoader.swift; sourceTree = "<group>"; };
 		8C2167372442A5F900117FB5 /* FetchData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchData.swift; sourceTree = "<group>"; };
 		8C2167392442B95300117FB5 /* Photos.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Photos.swift; sourceTree = "<group>"; };
+		8C21673D24456B1200117FB5 /* Favorites.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Favorites.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -169,6 +171,7 @@
 			children = (
 				8C2167392442B95300117FB5 /* Photos.swift */,
 				8C21673324410AF200117FB5 /* LaunchInfo.swift */,
+				8C21673D24456B1200117FB5 /* Favorites.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -309,6 +312,7 @@
 				8C2167362442A5C300117FB5 /* ImageLoader.swift in Sources */,
 				8C21673424410AF200117FB5 /* LaunchInfo.swift in Sources */,
 				8C2167382442A5F900117FB5 /* FetchData.swift in Sources */,
+				8C21673E24456B1200117FB5 /* Favorites.swift in Sources */,
 				8C2166F72441067800117FB5 /* ContentView.swift in Sources */,
 				8C21673A2442B95300117FB5 /* Photos.swift in Sources */,
 			);

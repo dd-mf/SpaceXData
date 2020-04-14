@@ -53,6 +53,7 @@ struct ContentView: View
 struct ListOfLaunches: View
 {
     @ObservedObject var items = LaunchInfo.History()
+    @ObservedObject var favorites = Favorites(named: "Launches")
 
     var body: some View
     {
@@ -67,12 +68,14 @@ struct ListOfLaunches: View
                 List(items.info!, rowContent: ListCell.init)
             }
         }
+        .environmentObject(favorites)
     }
 }
 
 struct ListOfPhotos: View
 {
     @ObservedObject var items = Photo.Library()
+    @ObservedObject var favorites = Favorites(named: "Photos")
     
     var body: some View
     {
@@ -87,6 +90,7 @@ struct ListOfPhotos: View
                 List(items.info!, rowContent: ListCell.init)
             }
         }
+        .environmentObject(favorites)
     }
 }
 
@@ -122,6 +126,24 @@ struct DetailView: View
     }
 }
 
+struct FavoritButton: View
+{
+    let id: Int
+    var isOn: Bool
+    {
+        return favorites.contains(id)
+    }
+    @EnvironmentObject var favorites: Favorites
+
+    var body: some View
+    {
+        Button(action: { self.favorites.toggle(self.id) })
+        {
+            Image(systemName: "heart" + (!isOn ? "" : ".fill"))
+        }
+    }
+}
+
 // MARK: -
 
 struct LaunchDetailView: View
@@ -138,6 +160,7 @@ struct LaunchDetailView: View
             Text("on \(launchInfo.launchDate)")
         }
         .navigationBarTitle(Text(launchInfo.missionName))
+        .navigationBarItems(trailing: FavoritButton(id: launchInfo.id))
     }
 }
 
@@ -158,6 +181,7 @@ struct PhotoDetailView: View
                 .infinity, alignment: .bottomTrailing)
         }
         .navigationBarTitle(Text(photo.title))
+        .navigationBarItems(trailing: FavoritButton(id: photo.id))
     }
 
     struct ImageInfoView: View
