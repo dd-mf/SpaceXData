@@ -8,6 +8,18 @@
 
 import Foundation
 
+func localFile(for url: URL) -> URL?
+{
+    guard let documents =
+        FileManager.default.urls(
+            for: .documentDirectory,
+            in: .userDomainMask).first else { return nil }
+    
+    let filename = url.path
+        .replacingOccurrences(of: "/", with: "-")
+    return documents.appendingPathComponent(filename)
+}
+
 /// fetches json data from specified urlString on
 /// a background dispatchQueue, decodes it, and calls closure on same
 /// thread initially called from with resulting array of Decodable type
@@ -44,18 +56,6 @@ func fetchData<Item: Decodable>(from urlString: String,
     }
 }
 
-fileprivate func filename(for url: URL) -> URL?
-{
-    guard let documents =
-        FileManager.default.urls(
-            for: .documentDirectory,
-            in: .userDomainMask).first else { return nil }
-    
-    let filename = url.path
-        .replacingOccurrences(of: "/", with: "-")
-    return documents.appendingPathComponent(filename)
-}
-
 fileprivate func fetch(from urlString: String,
                        decodeAndStore: @escaping ((Data) throws -> ()))
 {
@@ -65,28 +65,39 @@ fileprivate func fetch(from urlString: String,
         label: "fetch from: \(urlString)", qos: .background)
 
     queue.async {
-        let localFile = filename(for: url)
-        URLSession.shared.dataTask(with: url)
+        let file = localFile(for: url)
+
+        func process(_ data: Data?, quiet: Bool = false)
         {
-            data, response, error in
-        
             do
             {
-                guard let data = try data ??
-                    ((localFile == nil) ? nil :
-                        Data(contentsOf: localFile!)) else
+                guard let data =
+                    try data ?? ((file == nil) ? nil :
+                        Data(contentsOf: file!)) else
                 {
-                    return print("no response from \(url)")
+                    if !quiet { print("no response from \(url)") }
+                    return
                 }
-
+                
                 try decodeAndStore(data)
-                if let localFile = localFile
+                if let localFile = file
                 {
                     try data.write(to: localFile,
                                    options: .atomic)
                 }
             }
-            catch let error { print(error) }
-        }.resume()
+            catch let error
+            {
+                print("\(error) " + (data == nil ? "" :
+                    String(data: data!, encoding: .utf8) ?? "" ))
+            }
+        }
+        
+        if let localFile = file
+        {   // first try loading from cached file (if it exists)
+            do { process(try Data(contentsOf: localFile), quiet: true) } catch { }
+        }
+        
+        URLSession.shared.dataTask(with: url) { data, _, _ in process(data) }.resume()
     }
 }
