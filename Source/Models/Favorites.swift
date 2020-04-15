@@ -44,7 +44,12 @@ class Favorites<ID: Hashable>: ObservableObject
 
     func sort(_ lhs: ID, _ rhs: ID) -> Bool?
     {
-        return contains(lhs) && !contains(rhs) ? true : nil
+        let lhsIsFavorite = contains(lhs)
+        let rhsIsFavorite = contains(rhs)
+        
+        if lhsIsFavorite, !rhsIsFavorite { return true }
+        if !lhsIsFavorite, rhsIsFavorite { return false }
+        else { assert(lhsIsFavorite == rhsIsFavorite); return nil }
     }
     
     func toggle(_ id: ID) { (!contains(id) ? add : remove)(id) }
