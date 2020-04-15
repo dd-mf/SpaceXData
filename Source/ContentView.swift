@@ -85,13 +85,7 @@ struct ContentView: View
 
 struct ListOfLaunches: View
 {
-    @ObservedObject private var favorites: Favorites
-    @ObservedObject private var data: LaunchInfo.History
-    
-    init(data: LaunchInfo.History = LaunchInfo.History())
-    {
-        self.data = data; favorites = data.favorites
-    }
+    @ObservedObject private(set) var data = LaunchInfo.History()
     
     var body: some View
     {
@@ -106,19 +100,13 @@ struct ListOfLaunches: View
                 List(data.items!, rowContent: ListCell.init)
             }
         }
-        .environmentObject(favorites)
+        .environmentObject(data.favorites)
     }
 }
 
 struct ListOfPhotos: View
 {
-    @ObservedObject private var data: Photo.Library
-    @ObservedObject private var favorites: Favorites
-    
-    init(data: Photo.Library = Photo.Library())
-    {
-        self.data = data; favorites = data.favorites
-    }
+    @ObservedObject private(set) var data = Photo.Library()
     
     var body: some View
     {
@@ -133,7 +121,7 @@ struct ListOfPhotos: View
                 List(data.items!, rowContent: ListCell.init)
             }
         }
-        .environmentObject(favorites)
+        .environmentObject(data.favorites)
     }
 }
 
@@ -167,7 +155,7 @@ struct FavoriteMarker: View
 {
     var id: Int
     
-    @EnvironmentObject var favorites: Favorites
+    @EnvironmentObject var favorites: Favorites<Int>
     var isFavorite: Bool { return favorites.contains(id) }
 
     var body: some View
@@ -206,7 +194,7 @@ struct FavoritButton: View
 {
     let id: Int
     
-    @EnvironmentObject var favorites: Favorites
+    @EnvironmentObject var favorites: Favorites<Int>
     var isOn: Bool { return favorites.contains(id) }
 
     var body: some View

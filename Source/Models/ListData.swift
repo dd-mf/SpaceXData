@@ -17,7 +17,7 @@ class ListData<Item: Codable & Identifiable>:
     @Published private(set) var items: [Item]?
     
     @Published private(set) var favorites =
-        Favorites(named: String(describing: Item.self))
+        Favorites<Int>(named: String(describing: Item.self))
     
     init(from urlString: String)
     {

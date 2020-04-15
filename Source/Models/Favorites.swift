@@ -8,19 +8,21 @@
 
 import Foundation
 
-class Favorites: ObservableObject
+class Favorites<ID: Hashable>: ObservableObject
 {
     private let key: String
-    private var items: Set<Int>
+    private var items: Set<ID>
 
+    var count: Int { return items.count }
+    
     init(named name: String)
     {
         key = "favorites-" + name
         items = Set(UserDefaults.standard
-            .array(forKey: key) as? [Int] ?? [])
+            .array(forKey: key) as? [ID] ?? [])
     }
 
-    func add(_ id: Int)
+    func add(_ id: ID)
     {
         objectWillChange.send()
         items.insert(id)
@@ -33,19 +35,19 @@ class Favorites: ObservableObject
             .setValue(Array(items), forKey: key)
     }
     
-    func remove(_ id: Int)
+    func remove(_ id: ID)
     {
         objectWillChange.send()
         items.remove(id)
         save()
     }
 
-    func sort(_ lhs: Int, _ rhs: Int) -> Bool?
+    func sort(_ lhs: ID, _ rhs: ID) -> Bool?
     {
         return contains(lhs) && !contains(rhs) ? true : nil
     }
     
-    func toggle(_ id: Int) { (!contains(id) ? add : remove)(id) }
+    func toggle(_ id: ID) { (!contains(id) ? add : remove)(id) }
     
-    func contains(_ id: Int) -> Bool { return items.contains(id) }
+    func contains(_ id: ID) -> Bool { return items.contains(id) }
 }
