@@ -238,9 +238,9 @@ struct PhotoDetailView: View
         {
             AsyncImage(url: photo.url)
             
-            Group { ImageInfoView(for: photo) }
-            .frame(maxWidth: .infinity, maxHeight:
-                .infinity, alignment: .bottomTrailing)
+            ImageInfoView(for: photo)
+                .frame(maxWidth: .infinity, maxHeight:
+                    .infinity, alignment: .bottomTrailing)
         }
         .navigationBarTitle(Text(photo.title))
         .navigationBarItems(trailing: FavoritButton(id: photo.id))
