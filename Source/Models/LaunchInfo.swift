@@ -106,22 +106,9 @@ extension LaunchInfo
         case base, all, past, next, latest, upcoming, launch(number: Int)
     }
     
-    final class History: ObservableObject
+    final class History: ListData<LaunchInfo>
     {
-        @Published private(set) var items: [LaunchInfo]?
-        @Published var favorites = Favorites(named: "Launches")
-
-        init()
-        {
-            fetchData(from: API.past.urlString)
-            {
-                self.items = $0.sorted
-                {   // sort by favorite membership,
-                    // then sort by launchDate
-                    self.favorites.sort($0.id, $1.id) ??
-                        ($0.launchDate < $1.launchDate)
-                }
-            }
-        }
+        init() { super.init(from: API.past.urlString) }
+        override var secondarySort: Sort { return { $0.launchDate < $1.launchDate } }
     }
 }

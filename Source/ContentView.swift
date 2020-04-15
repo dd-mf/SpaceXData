@@ -81,6 +81,8 @@ struct ContentView: View
     }
 }
 
+// MARK: -
+
 struct ListOfLaunches: View
 {
     @ObservedObject private var favorites: Favorites
@@ -134,6 +136,8 @@ struct ListOfPhotos: View
         .environmentObject(favorites)
     }
 }
+
+// MARK: -
 
 struct ListCell: View
 {

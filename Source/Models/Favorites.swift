@@ -16,7 +16,8 @@ class Favorites: ObservableObject
     init(named name: String)
     {
         key = "favorites-" + name
-        items = Set(UserDefaults.standard.array(forKey: key) as? [Int] ?? [])
+        items = Set(UserDefaults.standard
+            .array(forKey: key) as? [Int] ?? [])
     }
 
     func add(_ id: Int)

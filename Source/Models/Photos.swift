@@ -53,21 +53,9 @@ extension Photo
 
 extension Photo
 {
-    final class Library: ObservableObject
+    final class Library: ListData<Photo>
     {
-        @Published private(set) var items: [Photo]?
-        @Published var favorites = Favorites(named: "Photos")
-
-        init()
-        {
-            fetchData(from: API.photos.urlString)
-            {
-                self.items = $0.sorted
-                {   // sort first by favorite membership, then by id
-                    self.favorites.sort($0.id, $1.id) ?? ($0.id < $1.id)
-                }
-            }
-        }
+        init() { super.init(from: API.photos.urlString) }
     }
 }
 
