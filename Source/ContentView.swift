@@ -19,12 +19,41 @@ protocol ListItem
 
 struct ContentView: View
 {
-    @State private var selectedTab = 0
-    
-    private let tabs: [(String, AnyView)] =
-        [("Photo Viewer", AnyView(ListOfPhotos())),
-         ("SpaceX Launches", AnyView(ListOfLaunches()))]
+    @State private var selectedTab = Tabs.photos
 
+    enum Tabs: Int, CaseIterable, Identifiable
+    {
+        case photos, launches
+        
+        var id: Tabs { self }
+
+        var label: String
+        {
+            switch self
+            {
+            case .photos: return "Photo Viewer"
+            case .launches: return "SpaceX Launches"
+            }
+        }
+        
+        var view: AnyView
+        {
+            // use cached instance, or create new
+            Self.views[self] = Self.views[self] ??
+            {
+                switch self
+                {
+                case .photos: return AnyView(ListOfPhotos())
+                case .launches: return AnyView(ListOfLaunches())
+                }
+            }()
+            
+            return Self.views[self]!
+        }
+        
+        private static var views = [Tabs: AnyView]()
+    }
+    
     var body: some View
     {
         NavigationView
@@ -33,14 +62,15 @@ struct ContentView: View
             {
                 Picker("", selection: $selectedTab)
                 {
-                    ForEach(0 ..< tabs.count)
+                    ForEach(Tabs.allCases)
                     {
-                        Text(self.tabs[$0].0)//.tag($0)
+                        Text($0.label)
                     }
                 }
                 .pickerStyle(SegmentedPickerStyle())
 
-                tabs[selectedTab].1 // listOf(Photos/Launches)
+                selectedTab.view
+                
                 Spacer()
             }
 
