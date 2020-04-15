@@ -280,25 +280,6 @@ struct PhotoDetailView: View
 
 // MARK: -
 
-struct ActivityIndicator: UIViewRepresentable
-{
-    @Binding var isAnimating: Bool
-    let style: UIActivityIndicatorView.Style
-
-    typealias Context = UIViewRepresentableContext<ActivityIndicator>
-    func makeUIView(context: Context) -> UIActivityIndicatorView
-    {
-        return UIActivityIndicatorView(style: style)
-    }
-
-    func updateUIView(_ uiView: UIActivityIndicatorView, context: Context)
-    {
-        isAnimating ? uiView.startAnimating() : uiView.stopAnimating()
-    }
-}
-
-// MARK: -
-
 struct ContentView_Previews: PreviewProvider
 {
     static var previews: some View { ContentView()  }
