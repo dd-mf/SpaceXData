@@ -83,25 +83,25 @@ struct ContentView: View
 
 struct ListOfLaunches: View
 {
-    init(items: LaunchInfo.History = LaunchInfo.History())
+    @ObservedObject private var favorites: Favorites
+    @ObservedObject private var data: LaunchInfo.History
+    
+    init(data: LaunchInfo.History = LaunchInfo.History())
     {
-        self.items = items; favorites = items.favorites
+        self.data = data; favorites = data.favorites
     }
     
-    @ObservedObject private var favorites: Favorites
-    @ObservedObject private var items: LaunchInfo.History
-
     var body: some View
     {
         VStack
         {
-            if items.info == nil
+            if data.items == nil
             {
                 Text("No Items Available")
             }
             else
             {
-                List(items.info!, rowContent: ListCell.init)
+                List(data.items!, rowContent: ListCell.init)
             }
         }
         .environmentObject(favorites)
@@ -110,26 +110,25 @@ struct ListOfLaunches: View
 
 struct ListOfPhotos: View
 {
-    @ObservedObject private var items: Photo.Library
+    @ObservedObject private var data: Photo.Library
     @ObservedObject private var favorites: Favorites
     
-    init(items: Photo.Library = Photo.Library())
+    init(data: Photo.Library = Photo.Library())
     {
-        self.items = items
-        favorites = items.favorites
+        self.data = data; favorites = data.favorites
     }
     
     var body: some View
     {
         VStack
         {
-            if items.info == nil
+            if data.items == nil
             {
                 Text("No Items Available")
             }
             else
             {
-                List(items.info!, rowContent: ListCell.init)
+                List(data.items!, rowContent: ListCell.init)
             }
         }
         .environmentObject(favorites)

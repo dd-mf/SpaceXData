@@ -108,14 +108,14 @@ extension LaunchInfo
     
     final class History: ObservableObject
     {
-        @Published private(set) var info: [LaunchInfo]?
+        @Published private(set) var items: [LaunchInfo]?
         @Published var favorites = Favorites(named: "Launches")
 
         init()
         {
             fetchData(from: API.past.urlString)
             {
-                self.info = $0.sorted
+                self.items = $0.sorted
                 {   // sort by favorite membership,
                     // then sort by launchDate
                     self.favorites.sort($0.id, $1.id) ??
