@@ -98,6 +98,7 @@ struct ListOfLaunches: View
             else
             {
                 List(data.items!, rowContent: ListCell.init)
+                    .onAppear { self.data.sortItems() }
             }
         }
         .environmentObject(data.favorites)
@@ -119,6 +120,7 @@ struct ListOfPhotos: View
             else
             {
                 List(data.items!, rowContent: ListCell.init)
+                    .onAppear { self.data.sortItems() }
             }
         }
         .environmentObject(data.favorites)
