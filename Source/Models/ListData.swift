@@ -21,7 +21,7 @@ class ListData<Item: Codable & Identifiable>:
     @Published private(set) var items: [Item]?
     
     @Published private(set) var favorites =
-        Favorites<Int>(named: String(describing: Item.self))
+        Favorites<Item>(named: String(describing: Item.self))
     
     init(from urlString: String)
     {
@@ -46,8 +46,8 @@ class ListData<Item: Codable & Identifiable>:
     private func sorted(items: [Item]) -> [Item]
     {
         return items.sorted
-        {   // sort by favorite membership, then by secondarySort
-            favorites.sort($0.id, $1.id) ?? secondarySort($0, $1)
+        {   // sort favorites first, then by secondarySort
+            favorites.sort($0, $1) ?? secondarySort($0, $1)
         }
     }
 }

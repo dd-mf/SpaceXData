@@ -97,7 +97,8 @@ struct ListOfLaunches: View
             }
             else
             {
-                List(data.items!, rowContent: ListCell.init)
+                List(data.items!,
+                     rowContent: ListCell.init)
                     .onAppear { self.data.sortItems() }
             }
         }
@@ -119,7 +120,8 @@ struct ListOfPhotos: View
             }
             else
             {
-                List(data.items!, rowContent: ListCell.init)
+                List(data.items!,
+                     rowContent: ListCell.init)
                     .onAppear { self.data.sortItems() }
             }
         }
@@ -129,15 +131,17 @@ struct ListOfPhotos: View
 
 // MARK: -
 
-struct ListCell: View
+struct ListCell<Item: ListItem & Identifiable>: View
 {
-    var item: ListItem
+    let item: Item
     
     var body: some View
     {
         HStack
         {
-            AsyncImage(url: item.thumbnailURL).frame(maxWidth: 30, maxHeight: 30)
+            AsyncImage(url: item.thumbnailURL)
+                .frame(maxWidth: 30, maxHeight: 30)
+            
             NavigationLink(destination: DetailView(info:item))
             {
                 // workaround vertical alignment issue
@@ -147,28 +151,28 @@ struct ListCell: View
                 }
                 .layoutPriority(1)
                 
-                FavoriteMarker(id: item.id)
+                Marker(item: item)
             }
         }
     }
-}
 
-struct FavoriteMarker: View
-{
-    var id: Int
-    
-    @EnvironmentObject var favorites: Favorites<Int>
-    var isFavorite: Bool { return favorites.contains(id) }
-
-    var body: some View
+    struct Marker: View
     {
-        Group
+        let item: Item
+        
+        @EnvironmentObject var favorites: Favorites<Item>
+        var isFavorite: Bool { return favorites.contains(item) }
+        
+        var body: some View
         {
-            if isFavorite
+            Group
             {
-                Spacer()
-                Image(systemName: "heart.fill")
-                    .accessibility(label: Text("This is a favorite item"))
+                if isFavorite
+                {
+                    Spacer()
+                    Image(systemName: "heart.fill")
+                        .accessibility(label: Text("This is a favorite item"))
+                }
             }
         }
     }
@@ -192,16 +196,16 @@ struct DetailView: View
     }
 }
 
-struct FavoritButton: View
+struct FavoritButton<Item: Identifiable>: View
 {
-    let id: Int
+    let item: Item
     
-    @EnvironmentObject var favorites: Favorites<Int>
-    var isOn: Bool { return favorites.contains(id) }
+    @EnvironmentObject var favorites: Favorites<Item>
+    var isOn: Bool { return favorites.contains(item) }
 
     var body: some View
     {
-        Button(action: { self.favorites.toggle(self.id) })
+        Button(action: { self.favorites.toggle(self.item) })
         {
             Image(systemName: "heart" + (!isOn ? "" : ".fill"))
         }
@@ -212,7 +216,7 @@ struct FavoritButton: View
 
 struct LaunchDetailView: View
 {
-    var launchInfo: LaunchInfo
+    let launchInfo: LaunchInfo
     
     var body: some View
     {
@@ -224,7 +228,7 @@ struct LaunchDetailView: View
             Text("on \(launchInfo.launchDate)")
         }
         .navigationBarTitle(Text(launchInfo.missionName))
-        .navigationBarItems(trailing: FavoritButton(id: launchInfo.id))
+        .navigationBarItems(trailing: FavoritButton(item: launchInfo))
     }
 }
 
@@ -232,7 +236,7 @@ struct LaunchDetailView: View
 
 struct PhotoDetailView: View
 {
-    var photo: Photo
+    let photo: Photo
     
     var body: some View
     {
@@ -245,7 +249,7 @@ struct PhotoDetailView: View
                     .infinity, alignment: .bottomTrailing)
         }
         .navigationBarTitle(Text(photo.title))
-        .navigationBarItems(trailing: FavoritButton(id: photo.id))
+        .navigationBarItems(trailing: FavoritButton(item: photo))
     }
 
     struct ImageInfoView: View

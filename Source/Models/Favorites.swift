@@ -8,10 +8,10 @@
 
 import Foundation
 
-class Favorites<ID: Hashable>: ObservableObject
+class Favorites<Item: Identifiable>: ObservableObject
 {
     private let key: String
-    private var items: Set<ID>
+    private var items: Set<Item.ID>
 
     var count: Int { return items.count }
     
@@ -19,13 +19,13 @@ class Favorites<ID: Hashable>: ObservableObject
     {
         key = "favorites-" + name
         items = Set(UserDefaults.standard
-            .array(forKey: key) as? [ID] ?? [])
+            .array(forKey: key) as? [Item.ID] ?? [])
     }
 
-    func add(_ id: ID)
+    func add(_ item: Item)
     {
         objectWillChange.send()
-        items.insert(id)
+        items.insert(item.id)
         save()
     }
 
@@ -35,14 +35,14 @@ class Favorites<ID: Hashable>: ObservableObject
             .setValue(Array(items), forKey: key)
     }
     
-    func remove(_ id: ID)
+    func remove(_ item: Item)
     {
         objectWillChange.send()
-        items.remove(id)
+        items.remove(item.id)
         save()
     }
 
-    func sort(_ lhs: ID, _ rhs: ID) -> Bool?
+    func sort(_ lhs: Item, _ rhs: Item) -> Bool?
     {
         let lhsIsFavorite = contains(lhs)
         let rhsIsFavorite = contains(rhs)
@@ -51,7 +51,7 @@ class Favorites<ID: Hashable>: ObservableObject
             lhsIsFavorite && !rhsIsFavorite : nil
     }
     
-    func toggle(_ id: ID) { (!contains(id) ? add : remove)(id) }
+    func toggle(_ item: Item) { (!contains(item) ? add : remove)(item) }
     
-    func contains(_ id: ID) -> Bool { return items.contains(id) }
+    func contains(_ item: Item) -> Bool { return items.contains(item.id) }
 }
