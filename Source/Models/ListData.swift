@@ -9,6 +9,8 @@
 import Combine
 import Foundation
 
+fileprivate let liveSorting = true
+
 class ListData<Item: Codable & Identifiable>:
     ObservableObject where Item.ID == Int
 {
@@ -28,6 +30,16 @@ class ListData<Item: Codable & Identifiable>:
         observer = favorites.objectWillChange.sink
         {
             [weak self] _ in self?.needsSorting = true
+            
+            guard liveSorting else { return }
+            OperationQueue.main.addOperation
+            {
+                [weak self] in
+                if let this = self, let items = this.items
+                {
+                    this.items = this.sorted(items: items)
+                }
+            }
         }
         
         fetchData(from: urlString) { self.items = self.sorted(items: $0) }

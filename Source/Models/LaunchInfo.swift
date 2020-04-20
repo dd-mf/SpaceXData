@@ -57,7 +57,6 @@ extension LaunchInfo: Identifiable
     var id: Int { return flightNum }
 }
 
-
 extension LaunchInfo: ListItem
 {
     var title: String { return missionName }
